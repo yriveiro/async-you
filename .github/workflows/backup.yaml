@@ -1,0 +1,26 @@
+name: Backup Repository
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+
+jobs:
+  backup:
+    runs-on: self-hosted
+    name: Full Backup
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Backup Repository Foo
+        run: |
+          curl --request POST \
+          --url https://api.github.com/orgs/${{ github.repository_owner }}/migrations \
+          --header 'authorization: Bearer ${{ github.token }}' \
+          --header 'Accept: application/vnd.github.wyandotte-preview+json' \
+          --data '{
+            "lock_repositories": false,
+            "repositories": ["${{ github.repository }}"]
+            }' \
+          --fail
